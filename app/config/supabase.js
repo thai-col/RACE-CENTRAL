@@ -2,8 +2,8 @@ import 'react-native-url-polyfill/auto';
 import { createClient } from '@supabase/supabase-js';
 import * as SecureStore from 'expo-secure-store';
 
-const supabaseUrl = 'https://tvsqpqxfrpneyuflfnnf.supabase.co';
-const supabaseAnonKey = 'sb_publishable_aVn3dcPiL6CJ0KmrGUUerw_9eJAiCZz';
+const supabaseUrl = 'https://xsiwxoksixbqxihirudu.supabase.co';
+const supabaseAnonKey = 'sb_publishable_9JOIcmJzuCs8IVCKgbSv4Q_JF8wExKa';
 
 const ExpoSecureStoreAdapter = {
   getItem: (key) => SecureStore.getItemAsync(key),

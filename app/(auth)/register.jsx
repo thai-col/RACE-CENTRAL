@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { useState } from 'react';
 import supabase from '../config/supabase';
 
@@ -14,6 +14,9 @@ export default function Register() {
       return;
     }
     supabase.auth.signUp({ email, password });
+    alert('Registration successful! Please check your email to confirm your account.');
+    router.replace('/(auth)/preferences');
+
   };
 
   return (
