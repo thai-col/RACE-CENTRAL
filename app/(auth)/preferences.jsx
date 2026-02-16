@@ -1,5 +1,7 @@
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import supabase from '../config/supabase';
+import { router } from 'expo-router';
 
 const Preferences = () => {
 
@@ -13,13 +15,61 @@ const Preferences = () => {
     }
   };
 
-  const seriesList = [
-    { name: 'Formula 1', image: require('../../assets/image/f1-logo.png') },
-    { name: 'WEC', image: require('../../assets/image/wec-logo.png') },
-    { name: 'MotoGP', image: require('../../assets/image/MotoGP-logo.png') },
-    { name: 'NASCAR', image: require('../../assets/image/nascar-logo.png') },
-    { name: 'IndyCar', image: require('../../assets/image/indycar-logo.png') },
-  ];
+  const [seriesList, setSeriesList] = useState([]);
+  
+  useEffect(() => {
+    fetchSeries();
+  }, []);
+
+  const fetchSeries = async () => {
+    const { data, error } = await supabase.from('series').select('*');
+    if (error) {
+      console.error('Error fetching series:', error);
+      return;
+    }
+    const seriesWithImages = data.map(series => {
+      const { data: publicUrlData } = supabase.storage.from('series').getPublicUrl(series.image_path);
+      return {
+        ...series,
+        imageUrl: publicUrlData.publicUrl
+      };
+    });
+    setSeriesList(seriesWithImages);
+  };
+
+  const savePreferences = async () => {
+  try {
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      Alert.alert('Error', 'User not authenticated!');
+      return;
+    }
+
+    // Save preferences
+    const { error } = await supabase
+      .from('user_preferences')
+      .upsert({
+        user_id: user.id,
+        selected_series: selected,  // Use your state variable
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'user_id'
+      });
+
+    if (error) {
+      console.error('Error saving preferences:', error);
+      alert('Error', error.message);
+    } else {
+      alert('Success', 'Preferences saved successfully!');
+      router.replace('/(tabs)');
+    }
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    alert('Error', 'Something went wrong!');
+  }
+};
 
   return (
     <View style={styles.container}>
@@ -37,11 +87,14 @@ const Preferences = () => {
             ]}
             onPress={() => toggleSelection(series.name)}
           >
-            <Image source={series.image} style={styles.logoImage} />
+            <Image source={{ uri: series.imageUrl }} style={styles.logoImage} />
             <Text style={styles.buttonText}>{series.name}</Text>
           </TouchableOpacity>
         );
       })}
+      <TouchableOpacity style={styles.saveButton} onPress={savePreferences}>
+        <Text style={styles.saveButtonText}>Save Preferences</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -63,6 +116,7 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
   button: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
     backgroundColor: '#171F2D',
@@ -86,5 +140,16 @@ const styles = StyleSheet.create({
     width: '30%',
     height: 60,
     resizeMode: 'contain',
+  },
+  saveButton: {
+    backgroundColor: '#E10600',
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 20,
+  },
+  saveButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
