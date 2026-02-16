@@ -7,11 +7,11 @@ const Preferences = () => {
 
   const [selected, setSelected] = useState([]);
 
-  const toggleSelection = (series) => {
-    if (selected.includes(series)) {
-      setSelected(selected.filter(item => item !== series));
+  const toggleSelection = (seriesId) => {
+    if (selected.includes(seriesId)) {
+      setSelected(selected.filter(item => item !== seriesId));
     } else {
-      setSelected([...selected, series]);
+      setSelected([...selected, seriesId]);
     }
   };
 
@@ -38,54 +38,58 @@ const Preferences = () => {
   };
 
   const savePreferences = async () => {
-  try {
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      Alert.alert('Error', 'User not authenticated!');
-      return;
-    }
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
 
-    // Save preferences
-    const { error } = await supabase
-      .from('user_preferences')
-      .upsert({
+      if (!user) {
+        alert('User not authenticated');
+        return;
+      }
+
+      // Build rows
+      const rows = selected.map(seriesId => ({
         user_id: user.id,
-        selected_series: selected,  // Use your state variable
-        updated_at: new Date().toISOString()
-      }, {
-        onConflict: 'user_id'
-      });
+        series_id: seriesId
+      }));
 
-    if (error) {
-      console.error('Error saving preferences:', error);
-      alert('Error', error.message);
-    } else {
-      alert('Success', 'Preferences saved successfully!');
+      // Optional: clear old prefs first
+      await supabase
+        .from('user_preferences')
+        .delete()
+        .eq('user_id', user.id);
+
+      // Insert new ones
+      const { error } = await supabase
+        .from('user_preferences')
+        .insert(rows);
+
+      if (error) throw error;
+
+      alert('Saved!');
       router.replace('/(tabs)');
+
+    } catch (err) {
+      console.error(err);
+      alert('Something went wrong');
     }
-  } catch (error) {
-    console.error('Unexpected error:', error);
-    alert('Error', 'Something went wrong!');
-  }
-};
+  };
+
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Select the Series You'd Like to Follow</Text>
 
       {seriesList.map((series) => {
-        const isSelected = selected.includes(series.name);
+        const isSelected = selected.includes(series.id);
 
         return (
           <TouchableOpacity
-            key={series.name}
+            key={series.id}
             style={[
               styles.button,
               isSelected && styles.selectedButton
             ]}
-            onPress={() => toggleSelection(series.name)}
+            onPress={() => toggleSelection(series.id)}
           >
             <Image source={{ uri: series.imageUrl }} style={styles.logoImage} />
             <Text style={styles.buttonText}>{series.name}</Text>
