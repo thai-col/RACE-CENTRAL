@@ -1,5 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native'
-import { Slot, Stack, Tabs } from 'expo-router'
+import { Tabs } from 'expo-router'
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 const RootLayout = () => {
@@ -31,5 +30,3 @@ const RootLayout = () => {
 }
 
 export default RootLayout
-
-const styles = StyleSheet.create({})

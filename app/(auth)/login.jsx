@@ -12,13 +12,27 @@ export default function Login() {
       alert('Please enter both email and password!');
       return;
     }
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      alert('Login failed: ' + error.message);
-    }
-    else
-    {
-      router.replace('/(tabs)');
+    const { data: { user }, error: loginError } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (loginError) {
+      alert('Login failed: ' + loginError.message);
+    } else {
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('display_name, onboarding_complete')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError) {
+        console.error('Failed to fetch profile:', profileError.message);
+        return;
+      }
+
+      if (profile.onboarding_complete === false) {
+        router.replace('/(auth)/preferences');
+      } else {
+        router.replace('/(tabs)');
+      }
     }
   };
 

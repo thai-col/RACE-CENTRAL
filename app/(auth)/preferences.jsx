@@ -58,6 +58,11 @@ const Preferences = () => {
         .delete()
         .eq('user_id', user.id);
 
+      await supabase
+        .from('profiles')
+        .update({ onboarding_complete: true })
+        .eq('id', user.id);
+
       // Insert new ones
       const { error } = await supabase
         .from('user_preferences')

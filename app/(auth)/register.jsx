@@ -1,23 +1,42 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { Link, router } from 'expo-router';
 import { useState } from 'react';
 import supabase from '../config/supabase';
 
 export default function Register() {
   const [email, setEmail] = useState('');
+  const [displayName, setDisplayName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleRegister = () => {
-    if (password !== confirmPassword) {
-      alert('Passwords do not match!');
-      return;
-    }
-    supabase.auth.signUp({ email, password });
-    alert('Registration successful! Please check your email to confirm your account.');
-    router.replace('/(auth)/preferences');
+  const handleRegister = async () => {
+  if (!email || !displayName || !password || !confirmPassword) {
+    Alert.alert('Error', 'Please fill in all fields');
+    return;
+  }
 
-  };
+  if (password !== confirmPassword) {
+    Alert.alert('Error', 'Passwords do not match');
+    return;
+  }
+
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        display_name: displayName.trim(),
+      },
+    },
+  });
+
+  if (error) {
+    Alert.alert('Signup error', error.message);
+    return;
+  }
+
+  router.replace('/(auth)/authAccount');
+};
 
   return (
     <View style={styles.container}>
@@ -30,6 +49,15 @@ export default function Register() {
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
+        autoCapitalize="none"
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Display Name"
+        placeholderTextColor="#888"
+        value={displayName}
+        onChangeText={setDisplayName}
         autoCapitalize="none"
       />
       
