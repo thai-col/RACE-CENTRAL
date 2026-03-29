@@ -17,13 +17,14 @@ export const getUserPreferredSeries = async (userId) => {
     console.log('Fetched user preferences:', data);
 
   if (error) throw error;
-
   return data.map(item => item.series);
 };
 
 export const getUsersNextEvent = async (userId) => {
   const series = await getUserPreferredSeries(userId);
+
   console.log('User preferred series:', series);
+  
   if (!series.length) return null;
 
   const requests = series.map(s =>
@@ -52,5 +53,32 @@ export const getUsersNextEvent = async (userId) => {
   console.log('Fetched events:', events);
   
   return events[0];
+};
+
+export const getAllNextEvents = async (userId) => {
+  const series = await getUserPreferredSeries(userId);
+  if (!series.length) return [];
+
+  const requests = series.map(s =>
+    axios.get(
+      `https://www.thesportsdb.com/api/v1/json/123/eventsnextleague.php?id=${s.api_id}`
+    )
+  );
+
+  const responses = await Promise.all(requests);
+
+  return responses
+    .map((res, i) => {
+      const event = res.data.events?.[0];
+      if (!event) return null;
+      return {
+        id: event.idEvent,
+        seriesName: series[i].name,
+        eventName: event.strEvent,
+        date: event.strTimestamp
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => new Date(a.date) - new Date(b.date));
 };
 

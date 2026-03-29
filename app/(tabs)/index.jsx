@@ -1,8 +1,11 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
 import { getUsersNextEvent } from '../../backend/services';
 import { useEffect, useState } from 'react';
 import supabase from '../config/supabase';
 import { StatusBar } from 'expo-status-bar';
+import { router } from 'expo-router';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { getAllNextEvents } from '../../backend/services';
 
 function calendarDateCountdown(targetDate) {
   const now = new Date();
@@ -31,6 +34,28 @@ export default function Home() {
     minutes: 0,
     seconds: 0,
   });
+  const [allEvents, setAllEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const [userSeries, setUserSeries] = useState([]);
+
+  const fetchUserSeries = async (userId) => {
+    const { data, error } = await supabase
+      .from('user_preferences')
+      .select(`
+        series:series_id (
+          id,
+          name,
+          api_id
+        )
+      `)
+      .eq('user_id', userId);
+
+    if (error) throw error;
+
+    setUserSeries(data.map((item) => item.series));
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -50,7 +75,6 @@ export default function Home() {
         .eq('id', user.id)
         .maybeSingle();
 
-
       if (profileError) {
         console.error('Error fetching profile:', profileError.message);
       } else {
@@ -59,6 +83,8 @@ export default function Home() {
 
       const nextEvent = await getUsersNextEvent(user.id);
       setEvent(nextEvent);
+
+      await fetchUserSeries(user.id);
     };
 
     load();
@@ -86,23 +112,69 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [event?.dateEvent]);
 
+  useEffect(() => {
+    const loadAllEvents = async () => {
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+        console.error('User not authenticated');
+        return;
+      }
+
+      const events = await getAllNextEvents(user.id);
+      setAllEvents(events);
+    };
+
+    loadAllEvents();
+  }, []);
+
+
   return (
     <View style={styles.container}>
-        <StatusBar style="light" />
-        <Text style={styles.welcomeText}> Welcome back, {profile?.display_name || 'User'}! </Text>
-        <View style={styles.nextContainer}>
-            <Text style={styles.nextEvent}>Next Event:</Text>
+      <StatusBar style="light" />
+      <Text style={styles.welcomeText}>
+        Welcome back, {profile?.display_name || 'User'}!
+      </Text>
 
-            <Text style={styles.tableText}> {event ? `${event.seriesName} - ${event.strEvent}`: 'No upcoming events'} </Text>
-
-            <View style={styles.countdownContainer}>
-                <Text style={styles.countdownText}> {countdown.days} Days : {countdown.hours} Hours : {countdown.minutes} Minutes : {countdown.seconds} Seconds </Text>
-            </View>
+      <View style={styles.nextContainer}>
+        <Text style={styles.nextEvent}>Next Event:</Text>
+        <Text style={styles.tableText}>
+          {event ? `${event.seriesName} - ${event.strEvent}` : 'No upcoming events'}
+        </Text>
+        <View style={styles.countdownContainer}>
+          <Text style={styles.countdownText}>
+            {countdown.days} Days : {countdown.hours} Hours : {countdown.minutes} Minutes : {countdown.seconds} Seconds
+          </Text>
         </View>
+      </View>
 
-        <View style={styles.userSeriesContainer}>
-            <Text style={styles.nextEvent}>Your Series:</Text>
-        </View>
+      <View style={styles.userSeriesContainer}>
+        <Text style={styles.nextEvent}>Your Series:</Text>
+        <FlatList
+          data={userSeries}
+          style={styles.series}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <Text style={styles.seriesText}>{item.name}</Text>
+          )}
+        />
+        <TouchableOpacity style={styles.button} onPress={() => router.replace('/(auth)/preferences')}>
+          <Text style={styles.managePreferencesButton}>Manage Preferences <Ionicons name="arrow-forward-outline" size={16} color="#fff" /></Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.allSeriesContainer}>
+        <Text style={styles.nextEvent}>Upcoming Events:</Text>
+        <FlatList
+          data={allEvents}
+          style={styles.series}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <Text style={styles.seriesText}>
+              {item.seriesName} - {item.eventName} - {new Date(item.strTimestamp).toLocaleDateString()}
+            </Text>
+          )}
+        />
+      </View>
     </View>
   );
 }
@@ -155,7 +227,28 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     width: '90%',
     padding: 10,
+    marginVertical: 10,
+  },
+    allSeriesContainer: {
+    backgroundColor: '#22265b',
+    borderWidth: 1,
+    borderRadius: 8,
+    width: '90%',
+    padding: 10,
+  },
+  seriesText: {
+    color: '#fff',
+    fontSize: 18,
+    padding: 10,
+    backgroundColor: '#26519b',
+    borderRadius: 5,
     marginVertical: 5,
   },
-
+  managePreferencesButton: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    alignSelf: 'flex-end',
+    marginTop: 10,
+  },
 });
