@@ -75,7 +75,7 @@ export const getAllNextEvents = async (userId) => {
         id: event.idEvent,
         seriesName: series[i].name,
         eventName: event.strEvent,
-        date: event.strTimestamp
+        date: event.dateEvent
       };
     })
     .filter(Boolean)

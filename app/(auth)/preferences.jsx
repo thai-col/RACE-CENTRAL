@@ -46,13 +46,11 @@ const Preferences = () => {
         return;
       }
 
-      // Build rows
       const rows = selected.map(seriesId => ({
         user_id: user.id,
         series_id: seriesId
       }));
 
-      // Optional: clear old prefs first
       await supabase
         .from('user_preferences')
         .delete()
@@ -63,7 +61,6 @@ const Preferences = () => {
         .update({ onboarding_complete: true })
         .eq('id', user.id);
 
-      // Insert new ones
       const { error } = await supabase
         .from('user_preferences')
         .insert(rows);
@@ -128,17 +125,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    backgroundColor: '#171F2D',
+    backgroundColor: '#111827',
     padding: 15,
-    borderColor: '#222734',
-    borderRadius: 10,
-    width: '85%',
+    borderRadius: 8,
+    width: '90%',
     height: 90,
-    borderWidth: 2,
-    marginTop: 20,
+    borderWidth: 1,
+    marginTop: 10,
   },
   selectedButton: {
-    borderColor: '#E10600', // Red highlight when selected
+    borderColor: '#E10600',
   },
   buttonText: {
     color: '#fff',
@@ -151,10 +147,15 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   saveButton: {
+    position: 'absolute',
+    bottom: 40,
     backgroundColor: '#E10600',
     padding: 15,
     borderRadius: 10,
-    marginTop: 20,
+    marginTop: 10,
+    width: '90%',
+    alignItems: 'center',
+    alignSelf: 'center',
   },
   saveButtonText: {
     color: '#fff',

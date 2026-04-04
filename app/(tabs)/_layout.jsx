@@ -18,6 +18,13 @@ const RootLayout = () => {
             tabBarIcon: ({ color, size }) => <Ionicons name="calendar" size={size} color={color} />
             }}
         />
+        <Tabs.Screen
+        name="standings"
+        options={{
+            title: 'Standings',
+            tabBarIcon: ({ color, size }) => <Ionicons name="podium" size={size} color={color} />
+        }}
+        />
         <Tabs.Screen 
         name="settings"
         options={{
