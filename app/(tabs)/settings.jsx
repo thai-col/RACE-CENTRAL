@@ -11,7 +11,6 @@ const handleSignOut = async () => {
   router.replace('/(auth)/login');
 };
 
-
 const settings = () => {
   return (
     <View style={styles.container}>
@@ -22,9 +21,6 @@ const settings = () => {
        <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
         <Text style={{color: '#fff', fontSize: 18}}>Logout</Text>
        </TouchableOpacity>
-       <View style={{marginTop: 20}}>
-        <Text style={{color: '#fff', fontSize: 18}}>Version 1.0.0</Text>
-       </View>
     </View>
   )
 }

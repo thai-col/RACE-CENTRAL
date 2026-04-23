@@ -67,12 +67,10 @@ const Preferences = () => {
 
       if (error) throw error;
 
-      alert('Saved!');
       router.replace('/(tabs)');
 
     } catch (err) {
       console.error(err);
-      alert('Something went wrong');
     }
   };
 

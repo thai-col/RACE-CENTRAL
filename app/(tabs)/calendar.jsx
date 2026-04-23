@@ -115,7 +115,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: '#E10600',
     paddingHorizontal: 8,
-    
   },
   placeholderStyle: {
     fontSize: 16,
