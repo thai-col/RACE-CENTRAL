@@ -2,6 +2,10 @@ import { StyleSheet, View, Text, FlatList } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { Dropdown } from 'react-native-element-dropdown';
 
+//Takes users selected series and returns a list of all upcoming events for those series.
+//  uses the sportsdb API to fetch the events for the selected series and displays them in a list.
+//  The user can select a series from the dropdown menu and the events will be updated accordingly.
+
 const Calendar = () => {
   const [selectedLeague, setSelectedLeague] = useState(null);
   const [events, setEvents] = useState([]);

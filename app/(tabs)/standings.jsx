@@ -43,6 +43,9 @@ const PLACEHOLDER_STANDINGS = {
   ],
 };
 
+
+// Fetches the current Formula 1 driver standings from the OpenF1 API and returns an array of driver objects with their 
+// position, name, team, and points.
 async function fetchF1Standings() {
   const [{ data: standings }, { data: drivers }] = await Promise.all([
     axios.get('https://api.openf1.org/v1/championship_drivers?session_key=latest'),

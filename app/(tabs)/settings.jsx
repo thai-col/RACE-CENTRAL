@@ -2,6 +2,11 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { router } from 'expo-router';
 import supabase from '../config/supabase';
 
+
+//The settings screen of the app that allows the user to manage their preferences and log out.
+// manage preferences button takes the user to the preferences screen where they can select which racing series they want to follow.
+// logout button signs the user out of their account and takes them back to the login screen.
+
 const handleSignOut = async () => {
   const { error } = await supabase.auth.signOut();
   if (error) {

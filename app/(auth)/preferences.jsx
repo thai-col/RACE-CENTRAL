@@ -3,6 +3,11 @@ import React, { useEffect, useState } from 'react';
 import supabase from '../config/supabase';
 import { router } from 'expo-router';
 
+//The preferences screen of the app that allows the user to select which racing series they want to follow.
+// It fetches the list of available series from the Supabase database and displays them as buttons with the series logo and name. 
+// The user can select multiple series by tapping on the buttons, which will toggle their selection state. 
+// When the user saves their preferences, it updates the user_preferences table in the database with the selected series for that user and marks the onboarding process as complete. 
+// After saving, it redirects the user to the home screen where they can see events and news related to their selected series.
 const Preferences = () => {
 
   const [selected, setSelected] = useState([]);

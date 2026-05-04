@@ -3,6 +3,10 @@ import { Link, router } from 'expo-router';
 import { useState } from 'react';
 import supabase from '../config/supabase';
 
+//The registration screen of the app that allows new users to create an account.
+// It includes input fields for email, display name, password, and confirm password. 
+// When the user submits the form, it validates the input and creates a new account using Supabase authentication. 
+// If the registration is successful, it redirects the user to the authAccount screen where they are prompted to confirm their email before they can log in.
 export default function Register() {
   const [email, setEmail] = useState('');
   const [displayName, setDisplayName] = useState('');

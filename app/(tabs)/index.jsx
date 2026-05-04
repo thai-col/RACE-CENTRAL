@@ -7,6 +7,11 @@
   import Ionicons from '@expo/vector-icons/Ionicons';
   import { getAllNextEvents } from '../../backend/services';
 
+  //Takes target date and returns the difference between that date and the current date in days, hours, minutes, and seconds
+  //If the target date is in the past, it returns 0 for all values
+  //This function is used to calculate the countdown for the next event on the home screen
+  //It is called every second to update the countdown timer
+
   function calendarDateCountdown(targetDate) {
     const now = new Date();
     const target = new Date(targetDate);
@@ -24,6 +29,12 @@
 
     return { days, hours, minutes, seconds };
   }
+
+  //The home screen of the app that the user sees after logging in. 
+  // It displays a welcome message, the next event for the user's selected series, 
+  // a countdown timer for that event, and a list of all upcoming events 
+  // for the user's selected series. It also has a button to manage preferences that 
+  // takes the user to the preferences screen.
 
   export default function Home() {
     const [event, setEvent] = useState(null);

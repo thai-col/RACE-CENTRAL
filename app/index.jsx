@@ -3,6 +3,11 @@ import { useState, useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import supabase from '../app/config/supabase';
 
+// The main entry point of the app that checks the user's authentication status and onboarding completion.
+// If the user is not authenticated, it redirects to the registration screen. 
+// If the user is authenticated but has not completed onboarding, it redirects to the preferences screen. 
+// If the user is authenticated and has completed onboarding, it redirects to the home screen. 
+// It also listens for authentication state changes to handle sign-out events and redirect accordingly.
 export default function Index() {
   const [redirectTo, setRedirectTo] = useState(null);
 

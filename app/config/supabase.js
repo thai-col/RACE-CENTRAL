@@ -2,6 +2,8 @@ import 'react-native-url-polyfill/auto';
 import { createClient } from '@supabase/supabase-js';
 import * as SecureStore from 'expo-secure-store';
 
+//Supabase configuration file that sets up the connection to the Supabase backend and configures authentication to use Expo's SecureStore for storing session data securely on the device.
+
 const supabaseUrl = 'https://xsiwxoksixbqxihirudu.supabase.co';
 const supabaseAnonKey = 'sb_publishable_9JOIcmJzuCs8IVCKgbSv4Q_JF8wExKa';
 

@@ -3,6 +3,13 @@ import { Link, router } from 'expo-router';
 import { useState } from 'react';
 import supabase from '../config/supabase';
 
+//The login screen of the app that allows existing users to sign in to their account.
+// It includes input fields for email and password. 
+// When the user submits the form, it validates the input and attempts to sign in using Supabase authentication.
+// If the login is successful, it checks if the user's onboarding process is complete by fetching their profile from the database.
+// If onboarding is not complete, it redirects the user to the preferences screen to select their favorite racing series. 
+// If onboarding is complete, it redirects the user to the home screen where they can see events and news related to their selected series.
+
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
